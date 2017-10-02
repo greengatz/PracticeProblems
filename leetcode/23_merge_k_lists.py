@@ -23,16 +23,9 @@ listOfLists.next.next = ListNode(l3)
 
 """
 approach:
-1) iterate through; keeping track of smallest node and the reference to it
-        after we reach end, pop it off
-        n*m; we go through each list once per node we pop
-
-2) think about various shortcuts
-    -make a binary search tree out of these lists, organized by the first node in each list
-        -then we can grab our node in log(m), n times
-        -this costs us mlog(m) sorting time initially
-            -worst case of nlog(m) popping + mlog(m) building the tree
-            -so worst case is no worse than naive best case, because naive is forced to compare always
+well then, I way overthought this one. 1st approach was comparing against all other lists,
+but that gives a worst case of n^2 (all lists one node). If we just take it all, put it in a list,
+sort, and pop, we get ourselves nlogn worst case.
 """
 
 class Solution(object):
@@ -41,36 +34,24 @@ class Solution(object):
         :type lists: List[ListNode]
         :rtype: ListNode
         """
+        allNodes = []
+
+        # put all values in a lists
+        for i in range(len(lists)):
+            currentList = lists[i]
+            while (currentList != None):
+                allNodes.append(currentList.val)
+                currentList = currentList.next
+
+        # sort the list
+        allNodes = sorted(allNodes)
+
+        # make that our linked list to return
         result = None
-        while (len(lists) > 0):
-            i = 0
-            smallestVal = None
-            targetList = 0
-
-            while (i < len(lists)):
-                if (lists[i] != None): # only check the list if it isn't empty
-                    currentNodeVal = lists[i].val
-                    #print ("checking ", currentNodeVal)
-                    if (smallestVal == None or currentNodeVal < smallestVal):
-                        #print("new smallest: ", currentNodeVal)
-                        targetList = i
-                        smallestVal = currentNodeVal
-                i = i + 1
-
-            if (smallestVal != None):
-                #print("now adding", smallestVal)
-                lists[targetList] = lists[targetList].next
-                newNode = ListNode(smallestVal)
-                if (result == None):
-                    result = newNode
-                else:
-                    tmp = result
-                    while (tmp.next != None):
-                        tmp = tmp.next
-                    tmp.next = newNode
-            else:
-                lists = []
-                # because of our inelegance in list management, we need to manually break
+        for i in reversed(range(len(allNodes))):
+            currentNode = ListNode(allNodes[i])
+            currentNode.next = result
+            result = currentNode
 
         return result
         
